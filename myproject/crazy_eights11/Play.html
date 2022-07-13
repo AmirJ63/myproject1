@@ -1,0 +1,172 @@
+{{ block content }}
+
+<style>
+    *, *::after, *::before {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 4rem);
+  grid-template-rows: 7rem 2rem 7rem;
+  gap: .5rem;
+  cursor: pointer;
+  justify-content: center;
+  padding-top: 1rem;
+}
+
+.deck {
+  height: 100%;
+  width: 100%;
+  border: 1px solid black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 3rem;
+  border-radius: .5rem;
+  color: white;
+  user-select: none;
+}
+
+.computer-deck {
+  background-color: green;
+}
+
+.player-deck {
+  background-color: blue;
+}
+
+.text {
+  grid-column: span 2;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.card {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  border: 1px solid black;
+  border-radius: .5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 4rem;
+}
+
+.card.red {
+  color: red;
+}
+
+.card.black {
+  color: black;
+}
+
+.card::before,
+.card::after {
+  position: absolute;
+  content: attr(data-value);
+  font-size: 1rem;
+}
+
+.card::before {
+  top: .5rem;
+  left: .5rem
+}
+
+.card::after {
+  bottom: .5rem;
+  right: .5rem;
+  transform: rotate(180deg);
+}
+
+</style>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Card Game</title>
+  <script src="script.js" type="module"></script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="computer-deck deck"></div>
+  <div class="computer-card-slot card-slot"></div>
+  <div class="text"></div>
+  <div class="player-deck deck"></div>
+  <div class="player-card-slot card-slot"></div>
+</body>
+
+<script>
+    const SUITS = ["♠"]
+const VALUES = [
+  "1",
+  "2",
+  "3",
+  "4",
+  "5",
+  "6",
+  "7",
+  "8",
+  "9",
+  "10",
+]
+
+export default class Deck {
+  constructor(cards = freshDeck()) {
+    this.cards = cards
+  }
+
+  get numberOfCards() {
+    return this.cards.length
+  }
+
+  pop() {
+    return this.cards.shift()
+  }
+
+  push(card) {
+    this.cards.push(card)
+  }
+
+  shuffle() {
+    for (let i = this.numberOfCards - 1; i > 0; i--) {
+      const newIndex = Math.floor(Math.random() * (i + 1))
+      const oldValue = this.cards[newIndex]
+      this.cards[newIndex] = this.cards[i]
+      this.cards[i] = oldValue
+    }
+  }
+}
+
+class Card {
+  constructor(suit, value) {
+    this.suit = suit
+    this.value = value
+  }
+
+  get color() {
+    return this.suit === "♣" || this.suit === "♠" ? "black" : "red"
+  }
+
+  getHTML() {
+    const cardDiv = document.createElement("div")
+    cardDiv.innerText = this.suit
+    cardDiv.classList.add("card", this.color)
+    cardDiv.dataset.value = `${this.value} ${this.suit}`
+    return cardDiv
+  }
+}
+
+function freshDeck() {
+  return SUITS.flatMap(suit => {
+    return VALUES.map(value => {
+      return new Card(suit, value)
+    })
+  })
+}
+
+{{ endblock }}
